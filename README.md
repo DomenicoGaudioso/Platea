@@ -1,5 +1,5 @@
 # Platea di Fondazione - Analisi Statica, Sismica e FEM
-
+![alt text](Platea.png)
 Un'applicazione web interattiva sviluppata in Python e Streamlit per l'analisi geotecnica e strutturale delle platee di fondazione. Il software valuta le pressioni di contatto, i cedimenti e le sollecitazioni interne (momenti flettenti) in condizioni statiche e sismiche, tenendo conto della stratigrafia del terreno e della presenza di falda acquifera.
 
 ## 🚀 Caratteristiche Principali
