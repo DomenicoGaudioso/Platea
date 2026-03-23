@@ -1,0 +1,1 @@
+App professionale per platea di fondazione con gestione stratigrafia, statico/sismico, falda, JSON e grafici Plotly.
