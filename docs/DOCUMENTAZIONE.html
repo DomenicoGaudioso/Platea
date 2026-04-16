@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platea - Documentazione Tecnica</title>
+    <style>
+        :root {
+            --primary: #1a3a5c;
+            --accent: #2980b9;
+            --accent2: #27ae60;
+            --danger: #e74c3c;
+            --warn: #f39c12;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --border: #dee2e6;
+            --text: #212529;
+            --text-light: #6c757d;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .hero {
+            background: linear-gradient(135deg, #1a3a5c 0%, #2c5f8a 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -50px;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: var(--bg);
+            clip-path: ellipse(60% 100% at 50% 100%);
+        }
+        .hero h1 {
+            font-size: 2.8em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+        .hero .subtitle {
+            font-size: 1.3em;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        .hero .version {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-top: 20px;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .toc {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 40px;
+        }
+        .toc h2 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        .toc ul {
+            columns: 2;
+            column-gap: 40px;
+            list-style: none;
+        }
+        .toc li {
+            margin-bottom: 8px;
+        }
+        .toc a {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.95em;
+            transition: color 0.2s;
+        }
+        .toc a:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+        .section {
+            margin-bottom: 50px;
+            scroll-margin-top: 20px;
+        }
+        .section h2 {
+            color: var(--primary);
+            font-size: 1.6em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--accent);
+        }
+        .section h3 {
+            color: var(--accent);
+            font-size: 1.2em;
+            margin: 25px 0 15px;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+        .card.info {
+            border-left: 4px solid var(--accent);
+        }
+        .card.warning {
+            border-left: 4px solid var(--warn);
+        }
+        .card.success {
+            border-left: 4px solid var(--accent2);
+        }
+        .card.danger {
+            border-left: 4px solid var(--danger);
+        }
+        .formula-box {
+            background: #f4f6f9;
+            border-left: 4px solid var(--accent);
+            padding: 20px 25px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .formula-box .label {
+            font-family: sans-serif;
+            font-size: 0.8em;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .formula-box .formula {
+            font-family: 'Cambria Math', 'Times New Roman', serif;
+            font-size: 1.4em;
+            color: var(--text);
+            line-height: 1.8;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+        th {
+            background: var(--primary);
+            color: white;
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+        }
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        tr:hover {
+            background: #eef4fa;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.78em;
+            font-weight: 600;
+        }
+        .badge.green {
+            background: #d4edda;
+            color: #155724;
+        }
+        .badge.yellow {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .badge.red {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+        ul.features {
+            list-style: none;
+            padding: 0;
+        }
+        ul.features li {
+            padding: 10px 0 10px 30px;
+            position: relative;
+            border-bottom: 1px solid var(--border);
+        }
+        ul.features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--accent2);
+            font-weight: bold;
+        }
+        .svg-container {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            text-align: center;
+            margin: 20px 0;
+        }
+        .svg-container h4 {
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        .footer {
+            background: var(--primary);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 60px;
+        }
+        .footer p {
+            opacity: 0.8;
+            font-size: 0.9em;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2em; }
+            .toc ul { columns: 1; }
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .container { padding: 20px 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HERO -->
+    <div class="hero">
+        <h1>Platea</h1>
+        <p class="subtitle">Analisi Statica, Sismica e FEM di Platee di Fondazione</p>
+        <span class="version">Versione 2.0</span>
+    </div>
+
+    <div class="container">
+
+        <!-- TOC -->
+        <div class="toc" id="indice">
+            <h2>📑 Indice dei Contenuti</h2>
+            <ul>
+                <li><a href="#panoramica">1. Panoramica Generale</a></li>
+                <li><a href="#funzionalita">2. Funzionalità e Verifiche Strutturali</a></li>
+                <li><a href="#formule">3. Principi Teorici e Formule</a></li>
+                <li><a href="#input">4. Input e Parametri di Calcolo</a></li>
+                <li><a href="#output">5. Output e Risultati</a></li>
+                <li><a href="#normativa">6. Riferimenti Normativi</a></li>
+                <li><a href="#diagrammi">7. Diagrammi Tecnici</a></li>
+                <li><a href="#esempio">8. Esempio di Utilizzo</a></li>
+                <li><a href="#glossario">9. Glossario</a></li>
+            </ul>
+        </div>
+
+        <!-- 1. PANORAMICA -->
+        <div class="section" id="panoramica">
+            <h2>1. Panoramica Generale</h2>
+            <div class="card info">
+                <p><strong>Platea</strong> è un'applicazione web sviluppata in Python e Streamlit per l'analisi geotecnica e strutturale delle platee di fondazione. Il software valuta le <em>pressioni di contatto</em>, i <em>cedimenti</em> e le <em>sollecitazioni interne</em> (momenti flettenti) in condizioni statiche e sismiche, tenendo conto della stratigrafia del terreno e della presenza di falda acquifera.</p>
+            </div>
+            <h3>Pubblico Target</h3>
+            <ul class="features">
+                <li>Ingegneri strutturali e geotecnici</li>
+                <li>Progettisti di fondazioni superficiali</li>
+                <li>Professionisti tecnici che operano nel campo dell'ingegneria civile</li>
+            </ul>
+            <h3>Normative di Riferimento</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Normativa</th>
+                        <th>Descrizione</th>
+                        <th>Stato</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>NTC 2018</td>
+                        <td>Norme Tecniche per le Costruzioni (D.M. 17/01/2018)</td>
+                        <td><span class="badge green">✓ Integrata</span></td>
+                    </tr>
+                    <tr>
+                        <td>Eurocodice 7</td>
+                        <td>Geotechnical design - EC7</td>
+                        <td><span class="badge green">✓ Riferimento</span></td>
+                    </tr>
+                    <tr>
+                        <td>Eurocodice 2</td>
+                        <td>Design of concrete structures</td>
+                        <td><span class="badge green">✓ Riferimento</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 2. FUNZIONALITÀ -->
+        <div class="section" id="funzionalita">
+            <h2>2. Funzionalità e Verifiche Strutturali</h2>
+            <div class="grid-2">
+                <div class="card info">
+                    <h3>🧱 Modellazione Multistrato</h3>
+                    <p>Gestione avanzata della stratigrafia del suolo con calcolo del modulo di Winkler equivalente, pesato sugli spessori degli strati geologici.</p>
+                </div>
+                <div class="card info">
+                    <h3>⚡ Analisi Statica e Pseudo-statica</h3>
+                    <p>Integrazione dei coefficienti sismici (k<sub>h</sub>, k<sub>v</sub>) e verifica dell'eccentricità dei carichi (nocciolo centrale d'inerzia).</p>
+                </div>
+                <div class="card info">
+                    <h3>🔬 Solutore FEM Integrato</h3>
+                    <p>Calcolo delle deformazioni e dei momenti flettenti (M<sub>x</sub>, M<sub>y</sub>) tramite il Metodo delle Differenze Finite (FDM) per piastre su suolo elastico.</p>
+                </div>
+                <div class="card info">
+                    <h3>📊 Visualizzazione Avanzata</h3>
+                    <p>Rendering 2D e 3D con Plotly per geometria, sezioni verticali, mappe di isocontorno delle pressioni e superfici di cedimento.</p>
+                </div>
+            </div>
+            <h3>Verifiche Strutturali</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Verifica</th>
+                        <th>Descrizione</th>
+                        <th>Esito</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Pressioni di contatto</td>
+                        <td>Confronto q<sub>max</sub> con q<sub>amm</sub></td>
+                        <td><span class="badge green">✓ AUTOMATICA</span></td>
+                    </tr>
+                    <tr>
+                        <td>Portanza sismica</td>
+                        <td>Verifica 1.3 × q<sub>amm</sub> in condizioni sismiche</td>
+                        <td><span class="badge green">✓ AUTOMATICA</span></td>
+                    </tr>
+                    <tr>
+                        <td>Eccentricità</td>
+                        <td>Confronto con nocciolo centrale d'inerzia</td>
+                        <td><span class="badge green">✓ AUTOMATICA</span></td>
+                    </tr>
+                    <tr>
+                        <td>Sollevamento</td>
+                        <td>Rilevamento pressioni negative (trazione)</td>
+                        <td><span class="badge green">✓ AUTOMATICA</span></td>
+                    </tr>
+                    <tr>
+                        <td>Uplift idrostatico</td>
+                        <td>Pressione di risalita in fondazione</td>
+                        <td><span class="badge green">✓ AUTOMATICA</span></td>
+                    </tr>
+                    <tr>
+                        <td>Cedimenti</td>
+                        <td>Confronto con limite di 50 mm</td>
+                        <td><span class="badge yellow">⚠ WARNING</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 3. FORMULE -->
+        <div class="section" id="formule">
+            <h2>3. Principi Teorici e Formule</h2>
+            <p>L'applicativo implementa due distinti livelli di analisi per garantire una valutazione completa dell'interazione terreno-struttura.</p>
+            
+            <h3>3.1 Modello Analitico a Piastra Rigida</h3>
+            <div class="formula-box">
+                <div class="label">Distribuzione delle pressioni di contatto (Estensione di Navier)</div>
+                <div class="formula">q(x,y) = N<sub>net</sub>/A + (6 M<sub>y</sub>*/L B²)·x + (6 M<sub>x</sub>*/B L²)·y</div>
+            </div>
+            <p>Dove:</p>
+            <ul>
+                <li><strong>N<sub>net</sub></strong> = carico verticale depurato della sottospinta idrostatica e ridotto dell'accelerazione sismica verticale (k<sub>v</sub>)</li>
+                <li><strong>M<sub>x</sub>*</strong>, <strong>M<sub>y</sub>*</strong> = momenti amplificati per effetto del coefficiente sismico orizzontale k<sub>h</sub></li>
+                <li><strong>A</strong> = area della platea = B × L</li>
+            </ul>
+            <br>
+            <div class="formula-box">
+                <div class="label">Cedimento medio (Modello di Winkler)</div>
+                <div class="formula">s<sub>med</sub> = N<sub>net</sub> / (k<sub>eq</sub> × A)</div>
+            </div>
+            <p>Il modulo di reazione equivalente k<sub>eq</sub> è calcolato come media pesata degli strati geologici:</p>
+            <div class="formula-box">
+                <div class="label">Modulo di Winkler equivalente</div>
+                <div class="formula">k<sub>eq</sub> = Σ(h<sub>i</sub> × k<sub>i</sub>) / Σh<sub>i</sub></div>
+            </div>
+            
+            <h3>3.2 Analisi Strutturale FEM (Kirchhoff-Love)</h3>
+            <div class="formula-box">
+                <div class="label">Equazione differenziale della piastra su suolo di Winkler</div>
+                <div class="formula">D ∇⁴w(x,y) + k<sub>s</sub> w(x,y) = q(x,y)</div>
+            </div>
+            <p>La rigidità flessionale della piastra:</p>
+            <div class="formula-box">
+                <div class="label">Rigidezza flessionale (Kirchhoff-Love)</div>
+                <div class="formula">D = E<sub>cls</sub> · t³ / [12(1 - ν²)]</div>
+            </div>
+            <p>I momenti flettenti sono calcolati dalle curvature:</p>
+            <div class="formula-box">
+                <div class="label">Momenti flettenti</div>
+                <div class="formula">M<sub>x</sub> = -D (∂²w/∂x² + ν ∂²w/∂y²)</div>
+            </div>
+            <div class="formula-box">
+                <div class="label">Momento flettente in y</div>
+                <div class="formula">M<sub>y</sub> = -D (∂²w/∂y² + ν ∂²w/∂x²)</div>
+            </div>
+            <div class="card warning">
+                <strong>Ipotesi del modello FEM:</strong>
+                <ul>
+                    <li>Piastra di Kirchhoff (sottile) con calcestruzzo elastico lineare</li>
+                    <li>Suolo di Winkler con k<sub>s</sub> dal modulo di reazione equivalente</li>
+                    <li>Bordi semplicemente appoggiati (w = 0 al bordo) — ipotesi conservativa per i momenti interni</li>
+                    <li>Distribuzione del carico lineare dalla soluzione analitica</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 4. INPUT -->
+        <div class="section" id="input">
+            <h2>4. Input e Parametri di Calcolo</h2>
+            
+            <h3>4.1 Geometria della Platea</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parametro</th>
+                        <th>Tipo</th>
+                        <th>Descrizione</th>
+                        <th>Unità</th>
+                        <th>Default</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>B</td>
+                        <td>float</td>
+                        <td>Dimensione base della platea in direzione x</td>
+                        <td>m</td>
+                        <td>10.0</td>
+                    </tr>
+                    <tr>
+                        <td>L</td>
+                        <td>float</td>
+                        <td>Dimensione della platea in direzione y</td>
+                        <td>m</td>
+                        <td>15.0</td>
+                    </tr>
+                    <tr>
+                        <td>t</td>
+                        <td>float</td>
+                        <td>Spessore della soletta</td>
+                        <td>m</td>
+                        <td>0.8</td>
+                    </tr>
+                    <tr>
+                        <td>z_fond</td>
+                        <td>float</td>
+                        <td>Profondità di posa (quota Piano di Posizione)</td>
+                        <td>m</td>
+                        <td>2.0</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>4.2 Carichi</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parametro</th>
+                        <th>Tipo</th>
+                        <th>Descrizione</th>
+                        <th>Unità</th>
+                        <th>Default</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>N</td>
+                        <td>float</td>
+                        <td>Carico verticale agente sul baricentro</td>
+                        <td>kN</td>
+                        <td>15000</td>
+                    </tr>
+                    <tr>
+                        <td>Mx</td>
+                        <td>float</td>
+                        <td>Momento flettente attorno all'asse x (causa eccentricità in y)</td>
+                        <td>kNm</td>
+                        <td>2000</td>
+                    </tr>
+                    <tr>
+                        <td>My</td>
+                        <td>float</td>
+                        <td>Momento flettente attorno all'asse y (causa eccentricità in x)</td>
+                        <td>kNm</td>
+                        <td>1200</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>4.3 Sismica e Falda</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parametro</th>
+                        <th>Tipo</th>
+                        <th>Descrizione</th>
+                        <th>Unità</th>
+                        <th>Default</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>kh</td>
+                        <td>float</td>
+                        <td>Coefficiente sismico orizzontale</td>
+                        <td>—</td>
+                        <td>0.15</td>
+                    </tr>
+                    <tr>
+                        <td>kv</td>
+                        <td>float</td>
+                        <td>Coefficiente sismico verticale</td>
+                        <td>—</td>
+                        <td>0.05</td>
+                    </tr>
+                    <tr>
+                        <td>falda</td>
+                        <td>float</td>
+                        <td>Profondità della falda freatica</td>
+                        <td>m</td>
+                        <td>99.0 (assente)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>4.4 Terreno e Stratigrafia</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parametro</th>
+                        <th>Tipo</th>
+                        <th>Descrizione</th>
+                        <th>Unità</th>
+                        <th>Default</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>q_amm</td>
+                        <td>float</td>
+                        <td>Pressione ammissibile del terreno</td>
+                        <td>kPa</td>
+                        <td>300</td>
+                    </tr>
+                    <tr>
+                        <td>profondita_influenza</td>
+                        <td>float</td>
+                        <td>Profondità di influenza del bulbo tensionale</td>
+                        <td>m</td>
+                        <td>5.0</td>
+                    </tr>
+                    <tr>
+                        <td>stratigrafia_csv</td>
+                        <td>str</td>
+                        <td>Matrice stratigrafica (6 campi per riga)</td>
+                        <td>—</td>
+                        <td>Vedi sotto</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>4.5 Parametri FEM (Opzionali)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parametro</th>
+                        <th>Tipo</th>
+                        <th>Descrizione</th>
+                        <th>Unità</th>
+                        <th>Default</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>E_cls</td>
+                        <td>float</td>
+                        <td>Modulo di Young del calcestruzzo</td>
+                        <td>kPa</td>
+                        <td>3×10⁷</td>
+                    </tr>
+                    <tr>
+                        <td>nu</td>
+                        <td>float</td>
+                        <td>Coefficiente di Poisson del calcestruzzo</td>
+                        <td>—</td>
+                        <td>0.2</td>
+                    </tr>
+                    <tr>
+                        <td>n_grid_fem</td>
+                        <td>int</td>
+                        <td>Numero di celle per lato nella griglia FEM</td>
+                        <td>—</td>
+                        <td>14</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>4.6 Formato Stratigrafia CSV</h3>
+            <div class="card info">
+                <p>La stratigrafia deve essere inserita come matrice CSV con 6 campi per riga:</p>
+                <p style="font-family: monospace; background: #f4f6f9; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                    spessore, gamma_dry, gamma_sat, phi_deg, cu_kPa, k_kN_m3
+                </p>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Campo</th>
+                        <th>Descrizione</th>
+                        <th>Unità</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>spessore</td>
+                        <td>Spessore dello strato</td>
+                        <td>m</td>
+                    </tr>
+                    <tr>
+                        <td>gamma_dry</td>
+                        <td>Peso di volume secco</td>
+                        <td>kN/m³</td>
+                    </tr>
+                    <tr>
+                        <td>gamma_sat</td>
+                        <td>Peso di volume saturo</td>
+                        <td>kN/m³</td>
+                    </tr>
+                    <tr>
+                        <td>phi_deg</td>
+                        <td>Angolo di attrito interno</td>
+                        <td>°</td>
+                    </tr>
+                    <tr>
+                        <td>cu_kPa</td>
+                        <td>Coesione non drenata</td>
+                        <td>kPa</td>
+                    </tr>
+                    <tr>
+                        <td>k_kN_m3</td>
+                        <td>Costante di Winkler</td>
+                        <td>kN/m³</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 5. OUTPUT -->
+        <div class="section" id="output">
+            <h2>5. Output e Risultati</h2>
+            
+            <h3>5.1 Metriche di Sintesi</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parametro</th>
+                        <th>Descrizione</th>
+                        <th>Unità</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>qmax_statico</td>
+                        <td>Pressione massima di contatto in condizione statica</td>
+                        <td>kPa</td>
+                    </tr>
+                    <tr>
+                        <td>qmax_sismico</td>
+                        <td>Pressione massima di contatto in condizione sismica</td>
+                        <td>kPa</td>
+                    </tr>
+                    <tr>
+                        <td>qmin_statico</td>
+                        <td>Pressione minima di contatto (possibile trazione)</td>
+                        <td>kPa</td>
+                    </tr>
+                    <tr>
+                        <td>ced_stat</td>
+                        <td>Cedimento medio statico</td>
+                        <td>mm</td>
+                    </tr>
+                    <tr>
+                        <td>ced_sism</td>
+                        <td>Cedimento medio sismico</td>
+                        <td>mm</td>
+                    </tr>
+                    <tr>
+                        <td>utilizzo_qamm</td>
+                        <td>Percentuale di utilizzo di q_amm</td>
+                        <td>%</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>5.2 Risultati FEM</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parametro</th>
+                        <th>Descrizione</th>
+                        <th>Unità</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Mx_max</td>
+                        <td>Massimo momento flettente in direzione x</td>
+                        <td>kNm/m</td>
+                    </tr>
+                    <tr>
+                        <td>My_max</td>
+                        <td>Massimo momento flettente in direzione y</td>
+                        <td>kNm/m</td>
+                    </tr>
+                    <tr>
+                        <td>w_max_mm</td>
+                        <td>Cedimento massimo FEM</td>
+                        <td>mm</td>
+                    </tr>
+                    <tr>
+                        <td>D_piastra</td>
+                        <td>Rigidezza flessionale della piastra</td>
+                        <td>kNm</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>5.3 Visualizzazioni</h3>
+            <div class="grid-4">
+                <div class="card info">
+                    <h4>📐 Geometria</h4>
+                    <p>Pianta con nocciolo, baricentro e frecce momenti</p>
+                </div>
+                <div class="card info">
+                    <h4>🔪 Sezione Verticale</h4>
+                    <p>Sezione trasversale con stratigrafia e falda</p>
+                </div>
+                <div class="card info">
+                    <h4>🗺️ Pressioni</h4>
+                    <p>Mappe contour delle pressioni di contatto</p>
+                </div>
+                <div class="card info">
+                    <h4>📈 Cedimenti</h4>
+                    <p>Superficie 3D dei cedimenti</p>
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="card info">
+                    <h4>📊 Momenti FEM (Mx)</h4>
+                    <p>Mappa contour del momento flettente Mx</p>
+                </div>
+                <div class="card info">
+                    <h4>📊 Momenti FEM (My)</h4>
+                    <p>Mappa contour del momento flettente My</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. NORMATIVA -->
+        <div class="section" id="normativa">
+            <h2>6. Riferimenti Normativi</h2>
+            <p>L'applicazione si basa sui seguenti riferimenti normativi italiani ed europei:</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Riferimento</th>
+                        <th>Descrizione</th>
+                        <th>Applicazione</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>NTC 2018</strong></td>
+                        <td>D.M. 17/01/2018 - Norme Tecniche per le Costruzioni</td>
+                        <td>Calcolo coefficiente sismico, verifica portanza</td>
+                    </tr>
+                    <tr>
+                        <td><strong>EC7</strong></td>
+                        <td>EN 1997-1:2004 - Geotechnical design</td>
+                        <td>Principi di verifica geotecnica</td>
+                    </tr>
+                    <tr>
+                        <td><strong>EC2</strong></td>
+                        <td>EN 1992-1-1:2004 - Design of concrete structures</td>
+                        <td>Calcolo rigidezza piastra in calcestruzzo</td>
+                    </tr>
+                    <tr>
+                        <td><strong>EC8</strong></td>
+                        <td>EN 1998-1:2004 - Seismic design</td>
+                        <td>Analisi pseudo-statica</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 7. DIAGRAMMI -->
+        <div class="section" id="diagrammi">
+            <h2>7. Diagrammi Tecnici</h2>
+            
+            <h3>7.1 Sezione Trasversale della Platea</h3>
+            <div class="svg-container">
+                <h4>Schema della sezione verticale — Geometria, stratigrafia e falda</h4>
+                <svg viewBox="0 0 700 400" width="100%" height="400" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <pattern id="soilPattern" width="10" height="10" patternUnits="userSpaceOnUse">
+                            <circle cx="5" cy="5" r="1" fill="#c8b07a"/>
+                        </pattern>
+                        <pattern id="concretePattern" width="8" height="8" patternUnits="userSpaceOnUse">
+                            <rect width="4" height="4" fill="#b0b8c8"/>
+                            <rect x="4" y="4" width="4" height="4" fill="#a0a8b8"/>
+                        </pattern>
+                    </defs>
+                    
+                    <!-- Terreno inferiore (strati) -->
+                    <rect x="50" y="50" width="600" height="320" fill="#e8d5b0" stroke="#8B7355" stroke-width="2"/>
+                    
+                    <!-- Linee strati -->
+                    <line x1="50" y1="130" x2="650" y2="130" stroke="#8B7355" stroke-width="1" stroke-dasharray="4"/>
+                    <text x="60" y="95" font-size="11" fill="#4a3728" font-weight="bold">Strato 1: φ=30° k=25000 kN/m³</text>
+                    
+                    <line x1="50" y1="200" x2="650" y2="200" stroke="#8B7355" stroke-width="1" stroke-dasharray="4"/>
+                    <text x="60" y="170" font-size="11" fill="#4a3728" font-weight="bold">Strato 2: φ=34° k=40000 kN/m³</text>
+                    
+                    <line x1="50" y1="300" x2="650" y2="300" stroke="#8B7355" stroke-width="1" stroke-dasharray="4"/>
+                    <text x="60" y="250" font-size="11" fill="#4a3728" font-weight="bold">Strato 3: Cu=120 kPa k=60000 kN/m³</text>
+                    
+                    <!-- Piano campagna -->
+                    <line x1="30" y1="50" x2="670" y2="50" stroke="#5a8a3c" stroke-width="3"/>
+                    <text x="600" y="45" font-size="12" fill="#5a8a3c" font-weight="bold">Piano campagna</text>
+                    
+                    <!-- Terreno di riempimento -->
+                    <rect x="150" y="20" width="400" height="30" fill="#c8b07a" stroke="#8B7355" stroke-width="1" opacity="0.6"/>
+                    <text x="330" y="40" font-size="10" fill="#6a5338">Riempimento</text>
+                    
+                    <!-- Platea (soletta) -->
+                    <rect x="150" y="-20" width="400" height="40" fill="url(#concretePattern)" stroke="#303850" stroke-width="2"/>
+                    <text x="350" y="0" font-size="14" fill="#303850" font-weight="bold" text-anchor="middle">PLATEA</text>
+                    <text x="350" y="15" font-size="10" fill="#303850" text-anchor="middle">t = 0.80 m</text>
+                    
+                    <!-- Quota di posa -->
+                    <line x1="100" y1="20" x2="600" y2="20" stroke="#a04020" stroke-width="2" stroke-dasharray="6"/>
+                    <text x="620" y="25" font-size="11" fill="#a04020" font-weight="bold">z = 2.00 m</text>
+                    
+                    <!-- Falda -->
+                    <line x1="100" y1="280" x2="600" y2="280" stroke="#2060c0" stroke-width="2" stroke-dasharray="4"/>
+                    <rect x="100" y="280" width="500" height="90" fill="#2060c0" opacity="0.15"/>
+                    <text x="620" y="275" font-size="11" fill="#2060c0" font-weight="bold">Falda z = 5.00 m</text>
+                    
+                    <!-- Profondità influenza -->
+                    <line x1="100" y1="370" x2="600" y2="370" stroke="#606060" stroke-width="2" stroke-dasharray="3"/>
+                    <text x="620" y="365" font-size="11" fill="#606060" font-weight="bold">Hinf = 5.00 m</text>
+                    
+                    <!-- Quote -->
+                    <line x1="50" y1="-30" x2="50" y2="370" stroke="#333" stroke-width="1"/>
+                    <line x1="45" y1="50" x2="55" y2="50" stroke="#333" stroke-width="2"/>
+                    <line x1="45" y1="20" x2="55" y2="20" stroke="#333" stroke-width="2"/>
+                    <line x1="45" y1="-20" x2="55" y2="-20" stroke="#333" stroke-width="2"/>
+                    <line x1="45" y1="370" x2="55" y2="370" stroke="#333" stroke-width="2"/>
+                    <text x="70" y="-10" font-size="10" fill="#333">±0.00</text>
+                    <text x="70" y="30" font-size="10" fill="#333">+2.00</text>
+                    <text x="70" y="380" font-size="10" fill="#333">7.00 m</text>
+                    
+                    <!-- Dimensioni B, L -->
+                    <line x1="150" y1="380" x2="550" y2="380" stroke="#1a3a5c" stroke-width="2"/>
+                    <line x1="150" y1="385" x2="150" y2="375" stroke="#1a3a5c" stroke-width="2"/>
+                    <line x1="550" y1="385" x2="550" y2="375" stroke="#1a3a5c" stroke-width="2"/>
+                    <text x="350" y="395" font-size="12" fill="#1a3a5c" text-anchor="middle" font-weight="bold">B × L = 10.0 m × 15.0 m</text>
+                </svg>
+            </div>
+            
+            <h3>7.2 Pianta con Nocciolo Centrale d'Inerzia</h3>
+            <div class="svg-container">
+                <h4>Schema pianta — Baricentro, nocciolo e eccentricità</h4>
+                <svg viewBox="0 0 500 400" width="100%" height="350" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Platea -->
+                    <rect x="75" y="50" width="350" height="300" fill="rgba(176,184,200,0.3)" stroke="#505870" stroke-width="3"/>
+                    <text x="250" y="205" font-size="14" fill="#505870" text-anchor="middle" font-weight="bold">PLATEA</text>
+                    
+                    <!-- Nocciolo centrale -->
+                    <ellipse cx="250" cy="200" rx="58" ry="50" fill="rgba(224,112,48,0.1)" stroke="#e07030" stroke-width="2" stroke-dasharray="6"/>
+                    <text x="250" y="160" font-size="10" fill="#e07030" text-anchor="middle">Nocciolo</text>
+                    <text x="250" y="173" font-size="9" fill="#e07030" text-anchor="middle">(B/3 × L/3)</text>
+                    
+                    <!-- Baricentro G -->
+                    <circle cx="250" cy="200" r="6" fill="#c03030"/>
+                    <text x="260" y="195" font-size="12" fill="#c03030" font-weight="bold">G</text>
+                    
+                    <!-- Punto di applicazione carico N -->
+                    <circle cx="290" cy="230" r="6" fill="#2080c0"/>
+                    <text x="300" y="225" font-size="12" fill="#2080c0" font-weight="bold">N</text>
+                    
+                    <!-- Freccia Mx -->
+                    <line x1="240" y1="190" x2="240" y2="130" stroke="#8030c0" stroke-width="3" marker-end="url(#arrowhead)"/>
+                    <text x="200" y="150" font-size="11" fill="#8030c0" font-weight="bold">Mx</text>
+                    
+                    <!-- Freccia My -->
+                    <line x1="260" y1="210" x2="320" y2="210" stroke="#30a030" stroke-width="3"/>
+                    <text x="290" y="240" font-size="11" fill="#30a030" font-weight="bold">My</text>
+                    
+                    <!-- Dimensioni -->
+                    <line x1="75" y1="360" x2="425" y2="360" stroke="#1a3a5c" stroke-width="2"/>
+                    <line x1="75" y1="355" x2="75" y2="365" stroke="#1a3a5c" stroke-width="2"/>
+                    <line x1="425" y1="355" x2="425" y2="365" stroke="#1a3a5c" stroke-width="2"/>
+                    <text x="250" y="380" font-size="12" fill="#1a3a5c" text-anchor="middle" font-weight="bold">B = 10.0 m</text>
+                    
+                    <line x1="435" y1="50" x2="435" y2="350" stroke="#1a3a5c" stroke-width="2"/>
+                    <line x1="430" y1="50" x2="440" y2="50" stroke="#1a3a5c" stroke-width="2"/>
+                    <line x1="430" y1="350" x2="440" y2="350" stroke="#1a3a5c" stroke-width="2"/>
+                    <text x="470" y="205" font-size="12" fill="#1a3a5c" text-anchor="middle" font-weight="bold" transform="rotate(90, 470, 205)">L = 15.0 m</text>
+                    
+                    <!-- Legend -->
+                    <rect x="50" y="15" width="150" height="25" fill="#f8f9fa" stroke="#dee2e6"/>
+                    <circle cx="65" cy="27" r="4" fill="#c03030"/>
+                    <text x="75" y="31" font-size="9" fill="#333">Baricentro G</text>
+                    <circle cx="120" cy="27" r="4" fill="#2080c0"/>
+                    <text x="130" y="31" font-size="9" fill="#333">Carico N</text>
+                </svg>
+            </div>
+            
+            <h3>7.3 Flusso delle Verifiche</h3>
+            <div class="svg-container">
+                <h4>Diagramma di flusso — Analisi statica e sismica</h4>
+                <svg viewBox="0 0 700 300" width="100%" height="300" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Start -->
+                    <rect x="280" y="10" width="140" height="35" rx="5" fill="#1a3a5c"/>
+                    <text x="350" y="33" font-size="12" fill="white" text-anchor="middle" font-weight="bold">INPUT</text>
+                    
+                    <line x1="350" y1="45" x2="350" y2="65" stroke="#1a3a5c" stroke-width="2"/>
+                    
+                    <!-- Geometria + Carichi -->
+                    <rect x="250" y="65" width="200" height="35" rx="5" fill="#2980b9"/>
+                    <text x="350" y="88" font-size="11" fill="white" text-anchor="middle">Geometria, Carichi, Stratigrafia</text>
+                    
+                    <line x1="350" y1="100" x2="350" y2="120" stroke="#2980b9" stroke-width="2"/>
+                    
+                    <!-- Analisi Statica -->
+                    <rect x="150" y="120" width="180" height="40" rx="5" fill="#27ae60"/>
+                    <text x="240" y="145" font-size="12" fill="white" text-anchor="middle" font-weight="bold">ANALISI</text>
+                    <text x="240" y="158" font-size="11" fill="white" text-anchor="middle">STATICA</text>
+                    
+                    <!-- Arrow to Sismica -->
+                    <line x1="330" y1="140" x2="370" y2="140" stroke="#2980b9" stroke-width="2"/>
+                    <polygon points="365,135 375,140 365,145" fill="#2980b9"/>
+                    
+                    <!-- Analisi Sismica -->
+                    <rect x="370" y="120" width="180" height="40" rx="5" fill="#f39c12"/>
+                    <text x="460" y="145" font-size="12" fill="white" text-anchor="middle" font-weight="bold">ANALISI</text>
+                    <text x="460" y="158" font-size="11" fill="white" text-anchor="middle">SISMICA</text>
+                    
+                    <line x1="350" y1="160" x2="350" y2="195" stroke="#2980b9" stroke-width="2"/>
+                    
+                    <!-- Verification box -->
+                    <rect x="180" y="195" width="340" height="45" rx="5" fill="#f8f9fa" stroke="#dee2e6"/>
+                    <text x="350" y="215" font-size="12" fill="#1a3a5c" text-anchor="middle" font-weight="bold">VERIFICHE</text>
+                    <text x="350" y="230" font-size="10" fill="#666" text-anchor="middle">qmax ≤ qamm | Eccentricità ≤ B/6, L/6 | qmin ≥ 0</text>
+                    
+                    <line x1="350" y1="240" x2="350" y2="260" stroke="#1a3a5c" stroke-width="2"/>
+                    
+                    <!-- Output -->
+                    <rect x="260" y="260" width="180" height="35" rx="5" fill="#27ae60"/>
+                    <text x="350" y="283" font-size="12" fill="white" text-anchor="middle" font-weight="bold">OUTPUT</text>
+                    
+                    <!-- FEM branch -->
+                    <line x1="520" y="140" x2="600" y2="140" stroke="#f39c12" stroke-width="2" stroke-dasharray="4"/>
+                    <text x="560" y="130" font-size="10" fill="#f39c12">Opzionale</text>
+                    <rect x="600" y="120" width="90" height="40" rx="5" fill="#8e44ad"/>
+                    <text x="645" y="145" font-size="10" fill="white" text-anchor="middle">FEM</text>
+                    <text x="645" y="158" font-size="9" fill="white" text-anchor="middle">Piastra</text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- 8. ESEMPIO -->
+        <div class="section" id="esempio">
+            <h2>8. Esempio di Utilizzo</h2>
+            <div class="card info">
+                <h3>Scenario: Verifica platea con carico eccentriche</h3>
+                <p>Una platea di fondazione di dimensioni <strong>10.0 m × 15.0 m</strong>, spessore <strong>0.80 m</strong>, profondità di posa <strong>2.0 m</strong>, è soggetta ai seguenti carichi:</p>
+                <ul>
+                    <li>Carico verticale N = 15000 kN</li>
+                    <li>Momento Mx = 2000 kNm</li>
+                    <li>Momento My = 1200 kNm</li>
+                </ul>
+                <p>Il terreno ha pressione ammissibile q<sub>amm</sub> = 300 kPa, falda assente.</p>
+            </div>
+            
+            <h3>Risultati Ottenuti</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parametro</th>
+                        <th>Statico</th>
+                        <th>Sismico (kh=0.15, kv=0.05)</th>
+                        <th>Verifica</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>qmax [kPa]</td>
+                        <td>146.7</td>
+                        <td>169.4</td>
+                        <td><span class="badge green">✓ qmax ≤ qamm</span></td>
+                    </tr>
+                    <tr>
+                        <td>qmin [kPa]</td>
+                        <td>53.3</td>
+                        <td>30.6</td>
+                        <td><span class="badge green">✓ qmin ≥ 0</span></td>
+                    </tr>
+                    <tr>
+                        <td>cedimento [mm]</td>
+                        <td>10.0</td>
+                        <td>11.5</td>
+                        <td><span class="badge green">✓ &lt; 50 mm</span></td>
+                    </tr>
+                    <tr>
+                        <td>eMx [m]</td>
+                        <td>0.13</td>
+                        <td>0.15</td>
+                        <td><span class="badge green">✓ &lt; B/6 = 1.67 m</span></td>
+                    </tr>
+                    <tr>
+                        <td>eMy [m]</td>
+                        <td>0.08</td>
+                        <td>0.09</td>
+                        <td><span class="badge green">✓ &lt; L/6 = 2.50 m</span></td>
+                    </tr>
+                    <tr>
+                        <td>Utilizzo qamm [%]</td>
+                        <td>48.9</td>
+                        <td>56.5</td>
+                        <td><span class="badge green">✓ &lt; 100%</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>Interpretazione</h3>
+            <div class="card success">
+                <p><strong>✓ Tutte le verifiche soddisfatte.</strong> La fondazione è idonea. Il caso sismico governa le pressioni di contatto (max 56.5% di q<sub>amm</sub>), ma la situazione è ampiamente verificata. Le eccentricità sono contenute dentro il nocciolo centrale d'inerzia, quindi non ci sono zone di trazione.</p>
+            </div>
+        </div>
+
+        <!-- 9. GLOSSARIO -->
+        <div class="section" id="glossario">
+            <h2>9. Glossario Tecnico</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Termine (IT)</th>
+                        <th>Termine (EN)</th>
+                        <th>Descrizione</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Platea di fondazione</td>
+                        <td>Foundation mat / Raft foundation</td>
+                        <td>Fondazione superficiale che distribuisce i carichi su un'area estesa</td>
+                    </tr>
+                    <tr>
+                        <td>Modulo di Winkler</td>
+                        <td>Winkler modulus / Subgrade reaction</td>
+                        <td>Costante che lega la pressione al cedimento (k = q/s)</td>
+                    </tr>
+                    <tr>
+                        <td>Nocciolo centrale d'inerzia</td>
+                        <td>Kern / Middle third</td>
+                        <td>Zona centrale della fondazione entro cui deve cadere il risultante per evitare trazione</td>
+                    </tr>
+                    <tr>
+                        <td>Coefficiente sismico</td>
+                        <td>Seismic coefficient</td>
+                        <td>Fattore che trasforma l'accelerazione sismica in forza pseudo-statica</td>
+                    </tr>
+                    <tr>
+                        <td>Pressione di contatto</td>
+                        <td>Contact pressure / Bearing pressure</td>
+                        <td>Tensione verticale alla interfaccia fondazione-terreno</td>
+                    </tr>
+                    <tr>
+                        <td>Uplift</td>
+                        <td>Uplift / Buoyant force</td>
+                        <td>Spinta idrostatica verso l'alto dovuta alla falda</td>
+                    </tr>
+                    <tr>
+                        <td>Cedimento</td>
+                        <td>Settlement / Deflection</td>
+                        <td>Deformazione verticale del terreno sotto carico</td>
+                    </tr>
+                    <tr>
+                        <td>Momento flettente</td>
+                        <td>Bending moment</td>
+                        <td>Sollecitazione interna che causa flessione nella piastra</td>
+                    </tr>
+                    <tr>
+                        <td>Equazione biarmonica</td>
+                        <td>Biharmonic equation</td>
+                        <td>Equazione differenziale del 4° ordine che governa la piastra di Kirchhoff</td>
+                    </tr>
+                    <tr>
+                        <td>Differenze Finite</td>
+                        <td>Finite Difference Method (FDM)</td>
+                        <td>Metodo numerico per la discretizzazione delle equazioni differenziali</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <h3>Disclaimer Tecnico</h3>
+        <p>Platea è uno strumento di calcolo ingegneristico sviluppato per finalità di analisi tecnica. I risultati prodotti sono indicativi e devono essere verificati da un professionista abilitato. L'autore non assume alcuna responsabilità per l'uso improprio del software. Tutti i calcoli devono essere validati secondo le Norme Tecniche vigenti e le prescrizioni del professionista incaricato.</p>
+        <p style="margin-top: 20px; opacity: 0.6;">© 2024-2026 Domenico Gaudioso — Documentazione Tecnica v2.0</p>
+    </div>
+
+</body>
+</html>
