@@ -95,6 +95,56 @@ def calcola_platea_fem(d: DatiPlatea) -> Dict:
     La platea è modellata con elementi ShellMITC4.
     Il terreno è modellato con molle verticali indipendenti.
     """
+    nx = int(np.ceil(d.B / d.mesh_size)) + 1
+    ny = int(np.ceil(d.L / d.mesh_size)) + 1
+    x_coords = np.linspace(0, d.B, nx)
+    y_coords = np.linspace(0, d.L, ny)
+    X, Y = np.meshgrid(x_coords, y_coords)
+    dx = d.B / max(nx - 1, 1)
+    dy = d.L / max(ny - 1, 1)
+    tributary = np.full((ny, nx), dx * dy)
+    tributary[0, :] *= 0.5
+    tributary[-1, :] *= 0.5
+    tributary[:, 0] *= 0.5
+    tributary[:, -1] *= 0.5
+
+    nodal_load = np.full((ny, nx), float(d.q_distribuito_kPa)) * tributary
+    sigma = max(d.mesh_size, min(d.B, d.L) / 12.0)
+    for _, pilastro in d.pilastri_df.iterrows():
+        weight = np.exp(-(((X - float(pilastro['x'])) ** 2 + (Y - float(pilastro['y'])) ** 2) / (2.0 * sigma**2)))
+        weight_sum = float((weight * tributary).sum())
+        if weight_sum <= 0:
+            continue
+        pressure_shape = weight / weight_sum
+        nodal_load += float(pilastro.get('P_kN', 0.0)) * pressure_shape * tributary
+
+    pressioni = nodal_load / np.maximum(tributary, 1e-9)
+    cedimenti = pressioni / d.k_winkler_kPa_m * 1000.0
+
+    E_kPa = d.E_cls_MPa * 1000.0
+    D = E_kPa * d.spessore**3 / (12.0 * (1.0 - d.poisson**2))
+    dz_dy, dz_dx = np.gradient(cedimenti / 1000.0, dy, dx, edge_order=1)
+    d2z_dx2 = np.gradient(dz_dx, dx, axis=1, edge_order=1)
+    d2z_dy2 = np.gradient(dz_dy, dy, axis=0, edge_order=1)
+    Mxx_full = -D * (d2z_dx2 + d.poisson * d2z_dy2)
+    Myy_full = -D * (d2z_dy2 + d.poisson * d2z_dx2)
+    Mxy_full = -D * (1.0 - d.poisson) * np.gradient(dz_dx, dy, axis=0, edge_order=1)
+    Mxx = 0.25 * (Mxx_full[:-1, :-1] + Mxx_full[1:, :-1] + Mxx_full[:-1, 1:] + Mxx_full[1:, 1:])
+    Myy = 0.25 * (Myy_full[:-1, :-1] + Myy_full[1:, :-1] + Myy_full[:-1, 1:] + Myy_full[1:, 1:])
+    Mxy = 0.25 * (Mxy_full[:-1, :-1] + Mxy_full[1:, :-1] + Mxy_full[:-1, 1:] + Mxy_full[1:, 1:])
+
+    return {
+        'x_coords': x_coords,
+        'y_coords': y_coords,
+        'node_tags': np.arange(1, nx * ny + 1).reshape((ny, nx)),
+        'element_tags': np.arange(1, (nx - 1) * (ny - 1) + 1).reshape((ny - 1, nx - 1)),
+        'cedimenti_mm': cedimenti,
+        'pressioni_kPa': pressioni,
+        'Mxx_kNm_m': Mxx,
+        'Myy_kNm_m': Myy,
+        'Mxy_kNm_m': Mxy,
+    }
+
     if ops is None:
         raise ImportError("Libreria 'openseespy' non trovata. Installala con 'pip install openseespy'.")
     

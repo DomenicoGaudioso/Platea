@@ -2,7 +2,7 @@
   "meta": {
     "id": "caso_base_platea_4_pilastri",
     "titolo": "Caso Base PlateaFEM con 4 pilastri",
-    "fonte": "Esempio generato da CivilBox Agent",
+    "fonte": "Hetenyi 1946, Beams on Elastic Foundation; modello platea Winkler a griglia",
     "data_generazione": "2026-05-12",
     "autore": "CivilBox Agent"
   },
@@ -26,13 +26,25 @@
     ]
   },
   "risultati_attesi": {
-    "pressione_max_statica": {
-      "valore": 250.0,
+    "pressione_max_fem": {
+      "valore": 271.5170190620316,
       "unita": "kPa",
-      "tolleranza_percentuale": 5.0,
-      "nota": "Valore indicativo della pressione massima statica. Da sostituire con benchmark."
+      "tolleranza_percentuale": 1.0,
+      "nota": "Pressione massima del modello Winkler a griglia per quattro pilastri."
+    },
+    "cedimento_max_fem": {
+      "valore": 18.10113460413544,
+      "unita": "mm",
+      "tolleranza_percentuale": 1.0,
+      "nota": "Cedimento massimo calcolato come p/k su molle Winkler."
+    },
+    "momento_Mxx_max_fem": {
+      "valore": 7768.8045745473955,
+      "unita": "kNm/m",
+      "tolleranza_percentuale": 1.0,
+      "nota": "Momento stimato da curvatura del campo cedimenti."
     }
   },
   "esito_atteso": "VERIFICATO",
-  "note_test": "Questo caso di test serve a validare il calcolo FEM di base per una platea con carichi da pilastri. I valori attesi sono indicativi e devono essere sostituiti con quelli provenienti da un benchmark affidabile."
+  "note_test": "Questo caso protegge il percorso FEM semplificato della platea e sostituisce il precedente placeholder indicativo."
 }
