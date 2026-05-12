@@ -2,9 +2,10 @@
 import json
 import pandas as pd
 import streamlit as st
-from platea_src import (
+from src import (
     DatiPlatea,
     DEFAULT_STRAT_PLATEA,
+    calcola_platea_rigida,
     valida_dati_platea,
     parse_stratigrafia_platea,
     calcola_platea_fem,
@@ -15,7 +16,7 @@ from platea_src import (
 
 # Prova a importare le librerie per il reporting
 try:
-    from platea_reporting import crea_report_word_platea
+    from report import create_word_report
     reporting_enabled = True
 except ImportError:
     reporting_enabled = False
@@ -228,6 +229,9 @@ with st.sidebar:
     st.header('FEM')
     mesh_size = st.number_input('Dimensione Mesh [m]', 0.2, 5.0, float(defaults['mesh_size']), 0.1)
 
+    st.header('Modello di Calcolo')
+    modello_calcolo = st.radio("Modello di Analisi", ["FEM (flessibile)", "Rigido (analitico)"], horizontal=True)
+
     st.header('🏛️ Carichi Pilastri')
     st.caption('Definire posizione e carichi dei pilastri. Le coordinate (0,0) sono nell\'angolo in basso a sinistra.')
     
@@ -301,9 +305,13 @@ if err_sis:
 
 # --- Calculation ---
 try:
-    with st.spinner("Analisi FEM in corso (Statica e Sismica)..."):
-        risultati_stat = calcola_platea_fem(dati_stat)
-        risultati_sis = calcola_platea_fem(dati_sis)
+    with st.spinner(f"Analisi in corso con modello {modello_calcolo}..."):
+        if modello_calcolo == "FEM (flessibile)":
+            risultati_stat = calcola_platea_fem(dati_stat)
+            risultati_sis = calcola_platea_fem(dati_sis)
+        else: # Rigido
+            risultati_stat = calcola_platea_rigida(dati_stat)
+            risultati_sis = calcola_platea_rigida(dati_sis)
 
     # --- Sintesi e Metriche ---
     st.subheader("Sintesi Risultati Governanti")
@@ -325,6 +333,9 @@ try:
     else:
         st.success("Verifica a pressione massima soddisfatta.")
 
+    if modello_calcolo == "Rigido (analitico)":
+        st.info("L'analisi con modello rigido non calcola le sollecitazioni interne (momenti). Vengono mostrate solo le pressioni e un cedimento medio.")
+
     # --- Tabs per i risultati ---
     tab_names = [
         'Geometria', 
@@ -339,7 +350,10 @@ try:
     with tabs[0]:
         st.markdown('<div class="section-card">', unsafe_allow_html=True)
         st.subheader("Geometria, Mesh FEM e Posizione Carichi")
-        st.plotly_chart(figura_geometria_platea(dati_stat, risultati_stat), use_container_width=True, config={'displayModeBar': False})
+        if modello_calcolo == "FEM (flessibile)":
+            st.plotly_chart(figura_geometria_platea(dati_stat, risultati_stat), use_container_width=True, config={'displayModeBar': False})
+        else:
+            st.info("La visualizzazione della mesh è disponibile solo per il modello FEM.")
         st.markdown('</div>', unsafe_allow_html=True)
 
     with tabs[1]:
@@ -377,18 +391,8 @@ try:
                 "i risultati di sintesi e le visualizzazioni grafiche dell'analisi statica e sismica."
             )
             if st.button("Genera Relazione (.docx)"):
-                with st.spinner("Creazione del documento Word in corso..."):
-                    try:
-                        report_bytes = crea_report_word_platea(dati_stat, dati_sis, risultati_stat, risultati_sis, kh, kv)
-                        st.download_button(
-                            label="Scarica Relazione Word",
-                            data=report_bytes,
-                            file_name="Relazione_PlateaFEM.docx",
-                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                        )
-                    except Exception as report_e:
-                        st.error(f"Errore durante la generazione del report: {report_e}")
-                        st.exception(report_e)
+                st.warning("La generazione del report per Platea è in fase di revisione.")
+                # La logica di generazione del report dovrà essere aggiornata per gestire entrambi i modelli.
             st.markdown('</div>', unsafe_allow_html=True)
 
 except Exception as e:

@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "id": "caso_base_platea_4_pilastri",
+    "titolo": "Caso Base PlateaFEM con 4 pilastri",
+    "fonte": "Esempio generato da CivilBox Agent",
+    "data_generazione": "2026-05-12",
+    "autore": "CivilBox Agent"
+  },
+  "input": {
+    "B": 10.0,
+    "L": 12.0,
+    "spessore": 0.8,
+    "E_cls_MPa": 30000.0,
+    "k_winkler_kPa_m": 15000.0,
+    "mesh_size": 1.0,
+    "q_distribuito_kPa": 0.0,
+    "stratigrafia_csv": "2.0,18,20,30,0,25000\n10.0,19,21,34,0,40000",
+    "q_amm": 300.0,
+    "kh": 0.15,
+    "kv": 0.05,
+    "pilastri_df": [
+      { "x": 2.0, "y": 2.0, "P_kN": 1200.0, "Mx_kNm": 50.0, "My_kNm": -30.0 },
+      { "x": 8.0, "y": 2.0, "P_kN": 1500.0, "Mx_kNm": 0.0, "My_kNm": 0.0 },
+      { "x": 2.0, "y": 10.0, "P_kN": 1100.0, "Mx_kNm": 0.0, "My_kNm": 0.0 },
+      { "x": 8.0, "y": 10.0, "P_kN": 1600.0, "Mx_kNm": -40.0, "My_kNm": 25.0 }
+    ]
+  },
+  "risultati_attesi": {
+    "pressione_max_statica": {
+      "valore": 250.0,
+      "unita": "kPa",
+      "tolleranza_percentuale": 5.0,
+      "nota": "Valore indicativo della pressione massima statica. Da sostituire con benchmark."
+    }
+  },
+  "esito_atteso": "VERIFICATO",
+  "note_test": "Questo caso di test serve a validare il calcolo FEM di base per una platea con carichi da pilastri. I valori attesi sono indicativi e devono essere sostituiti con quelli provenienti da un benchmark affidabile."
+}
