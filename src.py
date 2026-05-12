@@ -41,8 +41,16 @@ def valida_dati_platea(d: DatiPlatea) -> List[str]:
     if 'x' not in d.pilastri_df.columns or 'y' not in d.pilastri_df.columns:
         err.append("La tabella pilastri deve contenere le colonne 'x' e 'y'.")
     else:
-        if not d.pilastri_df.empty and (d.pilastri_df['x'].max() > d.B or d.pilastri_df['y'].max() > d.L):
+        if not d.pilastri_df.empty and (
+            d.pilastri_df['x'].max() > d.B
+            or d.pilastri_df['y'].max() > d.L
+            or d.pilastri_df['x'].min() < 0
+            or d.pilastri_df['y'].min() < 0
+        ):
             err.append('Posizione pilastro fuori dalla geometria della platea.')
+    for col in ['P_kN', 'Mx_kNm', 'My_kNm']:
+        if col not in d.pilastri_df.columns:
+            err.append(f"La tabella pilastri deve contenere la colonna '{col}'.")
     return err
 
 def parse_stratigrafia_platea(csv_text: str) -> Tuple[pd.DataFrame, List[str]]:
@@ -387,3 +395,84 @@ def calcola_platea_rigida(d: DatiPlatea) -> Dict:
         'Mxx_kNm_m': np.zeros((ny_grid-1, nx_grid-1)),
         'Myy_kNm_m': np.zeros((ny_grid-1, nx_grid-1)),
     }
+
+
+def riepilogo_platea(d: DatiPlatea, risultati: Dict, q_amm: float, nome: str) -> Dict[str, float | str]:
+    pressioni = np.asarray(risultati['pressioni_kPa'], dtype=float)
+    cedimenti = np.asarray(risultati['cedimenti_mm'], dtype=float)
+    mxx = np.asarray(risultati.get('Mxx_kNm_m', np.zeros((1, 1))), dtype=float)
+    myy = np.asarray(risultati.get('Myy_kNm_m', np.zeros((1, 1))), dtype=float)
+    p_max = float(np.nanmax(pressioni))
+    p_min = float(np.nanmin(pressioni))
+    c_max = float(np.nanmax(np.abs(cedimenti)))
+    m_max = float(max(np.nanmax(np.abs(mxx)), np.nanmax(np.abs(myy))))
+    limite = float(q_amm)
+    dc = p_max / limite if limite > 0 else np.inf
+    return {
+        'Caso': nome,
+        'q_max_kPa': p_max,
+        'q_min_kPa': p_min,
+        'cedimento_max_mm': c_max,
+        'momento_max_kNm_m': m_max,
+        'q_amm_kPa': limite,
+        'D_C_pressione': dc,
+        'Esito': 'VERIFICATO' if dc <= 1.0 and p_min >= 0.0 else 'NON VERIFICATO',
+    }
+
+
+def tabella_sintesi_platea(d: DatiPlatea, risultati_stat: Dict, risultati_sis: Dict, q_amm: float) -> pd.DataFrame:
+    righe = [
+        riepilogo_platea(d, risultati_stat, q_amm, 'Statica'),
+        riepilogo_platea(d, risultati_sis, q_amm * 1.25, 'Sismica'),
+    ]
+    return pd.DataFrame(righe)
+
+
+def genera_verifiche_platea(d: DatiPlatea, risultati_stat: Dict, risultati_sis: Dict, q_amm: float) -> pd.DataFrame:
+    sintesi = tabella_sintesi_platea(d, risultati_stat, risultati_sis, q_amm)
+    rows = []
+    for _, row in sintesi.iterrows():
+        rows.append({
+            'Verifica': f"Pressione massima {row['Caso']}",
+            'Ed': row['q_max_kPa'],
+            'Rd': row['q_amm_kPa'],
+            'D/C': row['D_C_pressione'],
+            'Esito': 'VERIFICATO' if row['D_C_pressione'] <= 1.0 else 'NON VERIFICATO',
+        })
+        rows.append({
+            'Verifica': f"Assenza trazioni {row['Caso']}",
+            'Ed': abs(min(row['q_min_kPa'], 0.0)),
+            'Rd': 0.0,
+            'D/C': '-' if row['q_min_kPa'] >= 0.0 else 'inf',
+            'Esito': 'VERIFICATO' if row['q_min_kPa'] >= 0.0 else 'NON VERIFICATO',
+        })
+    rows.append({
+        'Verifica': 'Cedimento massimo indicativo',
+        'Ed': float(sintesi['cedimento_max_mm'].max()),
+        'Rd': 50.0,
+        'D/C': float(sintesi['cedimento_max_mm'].max()) / 50.0,
+        'Esito': 'VERIFICATO' if float(sintesi['cedimento_max_mm'].max()) <= 50.0 else 'ATTENZIONE',
+    })
+    return pd.DataFrame(rows)
+
+
+def tabella_input_platea(d: DatiPlatea, q_amm: float) -> pd.DataFrame:
+    return pd.DataFrame([
+        {'Parametro': 'B', 'Valore': d.B, 'Unita': 'm', 'Descrizione': 'Dimensione platea in direzione x'},
+        {'Parametro': 'L', 'Valore': d.L, 'Unita': 'm', 'Descrizione': 'Dimensione platea in direzione y'},
+        {'Parametro': 'Spessore', 'Valore': d.spessore, 'Unita': 'm', 'Descrizione': 'Spessore strutturale della platea'},
+        {'Parametro': 'E cls', 'Valore': d.E_cls_MPa, 'Unita': 'MPa', 'Descrizione': 'Modulo elastico calcestruzzo'},
+        {'Parametro': 'k Winkler', 'Valore': d.k_winkler_kPa_m, 'Unita': 'kPa/m', 'Descrizione': 'Modulo di reazione del terreno'},
+        {'Parametro': 'q amm', 'Valore': q_amm, 'Unita': 'kPa', 'Descrizione': 'Pressione ammissibile statica'},
+        {'Parametro': 'Mesh', 'Valore': d.mesh_size, 'Unita': 'm', 'Descrizione': 'Passo della griglia di calcolo'},
+        {'Parametro': 'q distribuito', 'Valore': d.q_distribuito_kPa, 'Unita': 'kPa', 'Descrizione': 'Carico distribuito aggiuntivo'},
+        {'Parametro': 'Numero pilastri', 'Valore': len(d.pilastri_df), 'Unita': '-', 'Descrizione': 'Righe attive nella tabella carichi'},
+    ])
+
+
+def genera_note_platea(modello: str) -> List[str]:
+    return [
+        f"Modello selezionato: {modello}.",
+        "Il modello FEM flessibile usa una griglia Winkler deterministica con ripartizione locale dei carichi concentrati.",
+        "Le verifiche riportate sono controlli geotecnici/SLE automatici; le verifiche strutturali di armatura restano a cura del progettista.",
+    ]

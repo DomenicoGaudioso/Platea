@@ -11,7 +11,10 @@ from src import (
     calcola_platea_fem,
     figura_geometria_platea,
     figura_risultati_platea,
+    genera_note_platea,
+    genera_verifiche_platea,
     stima_k_winkler_da_stratigrafia,
+    tabella_sintesi_platea,
 )
 
 # Prova a importare le librerie per il reporting
@@ -321,6 +324,8 @@ try:
     
     ced_max_stat = risultati_stat['cedimenti_mm'].max().max()
     ced_max_sis = risultati_sis['cedimenti_mm'].max().max()
+    sintesi_df = tabella_sintesi_platea(dati_stat, risultati_stat, risultati_sis, q_amm)
+    verifiche_df = genera_verifiche_platea(dati_stat, risultati_stat, risultati_sis, q_amm)
 
     c1, c2, c3 = st.columns(3)
     c1.metric("Pressione Max Statica [kPa]", f"{p_max_stat:.1f}", f"Limite: {q_amm:.1f}")
@@ -341,7 +346,17 @@ try:
         'Geometria', 
         'Risultati Statici', 
         'Risultati Sismici',
+        'Verifiche',
     ]
+    with tabs[3]:
+        st.markdown('<div class="section-card">', unsafe_allow_html=True)
+        st.subheader("Verifiche e sintesi tecnica")
+        st.dataframe(sintesi_df, use_container_width=True, hide_index=True)
+        st.dataframe(verifiche_df, use_container_width=True, hide_index=True)
+        for note in genera_note_platea(modello_calcolo):
+            st.info(note)
+        st.markdown('</div>', unsafe_allow_html=True)
+
     if reporting_enabled:
         tab_names.append('Report')
     
@@ -383,16 +398,30 @@ try:
         st.markdown('</div>', unsafe_allow_html=True)
 
     if reporting_enabled:
-        with tabs[3]:
+        with tabs[4]:
             st.markdown('<div class="section-card">', unsafe_allow_html=True)
             st.subheader("Generazione Relazione Tecnica")
             st.markdown(
                 "Crea un report di calcolo in formato Microsoft Word (.docx) contenente i dati di input, "
                 "i risultati di sintesi e le visualizzazioni grafiche dell'analisi statica e sismica."
             )
-            if st.button("Genera Relazione (.docx)"):
-                st.warning("La generazione del report per Platea è in fase di revisione.")
-                # La logica di generazione del report dovrà essere aggiornata per gestire entrambi i modelli.
+            try:
+                report_bytes = create_word_report(
+                    dati_stat,
+                    risultati_stat,
+                    dati_sis,
+                    risultati_sis,
+                    q_amm,
+                    modello_calcolo,
+                )
+                st.download_button(
+                    "Scarica relazione (.docx)",
+                    data=report_bytes,
+                    file_name="relazione_platea.docx",
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                )
+            except Exception as report_exc:
+                st.error(f"Generazione relazione non riuscita: {report_exc}")
             st.markdown('</div>', unsafe_allow_html=True)
 
 except Exception as e:
