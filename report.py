@@ -6,7 +6,7 @@ from typing import Dict, Iterable
 
 import pandas as pd
 from docx import Document
-from docx.shared import Pt
+from docx.shared import Cm, Pt
 
 from src import (
     DatiPlatea,
@@ -53,6 +53,31 @@ def _pilastri_report(d: DatiPlatea) -> pd.DataFrame:
     return out.loc[:, cols]
 
 
+def _add_map_plot(doc: Document, data, title: str, cbar_label: str) -> None:
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    values = data.to_numpy() if hasattr(data, "to_numpy") else data
+    fig, ax = plt.subplots(figsize=(6.8, 4.2), dpi=160)
+    try:
+        im = ax.imshow(values, origin="lower", cmap="Greys")
+        ax.set_title(title, loc="left", fontsize=10, fontweight="bold", color="#111111")
+        ax.set_xlabel("Indice griglia x")
+        ax.set_ylabel("Indice griglia y")
+        fig.colorbar(im, ax=ax, label=cbar_label, shrink=0.85)
+        fig.tight_layout()
+        bio = BytesIO()
+        fig.savefig(bio, format="png", dpi=160, bbox_inches="tight", facecolor="white")
+        plt.close(fig)
+        bio.seek(0)
+        doc.add_picture(bio, width=Cm(14.8))
+    except Exception:
+        plt.close(fig)
+        raise
+
+
 def create_word_report(
     dati_stat: DatiPlatea,
     risultati_stat: Dict,
@@ -80,7 +105,12 @@ def create_word_report(
     doc.add_heading("4. Verifiche", level=1)
     _add_table(doc, genera_verifiche_platea(dati_stat, risultati_stat, risultati_sis, q_amm))
 
-    doc.add_heading("5. Note tecniche", level=1)
+    doc.add_heading("5. Grafici statici", level=1)
+    _add_map_plot(doc, risultati_stat["pressioni_kPa"], "Pressioni di contatto - caso statico", "kPa")
+    _add_map_plot(doc, risultati_sis["pressioni_kPa"], "Pressioni di contatto - caso sismico", "kPa")
+    _add_map_plot(doc, risultati_stat["cedimenti_mm"], "Cedimenti - caso statico", "mm")
+
+    doc.add_heading("6. Note tecniche", level=1)
     for note in genera_note_platea(modello):
         doc.add_paragraph(note, style="List Bullet")
 

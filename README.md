@@ -55,7 +55,7 @@ L'applicazione richiede l'inserimento di parametri attraverso un'interfaccia a b
 
 ### Dati Generati (Output)
 L'elaborazione restituisce:
-* **Metriche di Sintesi**: Pressioni massime e minime ($q_{max}$, $q_{min}$), cedimenti medi statici e sismici, e percentuale di utilizzo della $q_{amm}$.
+* **Risultati principali tabellati**: Pressioni massime e minime ($q_{max}$, $q_{min}$), cedimenti medi statici e sismici, e percentuale di utilizzo della $q_{amm}$.
 * **Warning Tecnici**: Segnalazioni automatiche per eccentricità fuori dal nocciolo centrale, sollevamento della fondazione (trazione), superamento dei limiti di portanza o cedimenti eccessivi.
 * **Mappe Contour (2D/3D)**: Distribuzione spaziale delle pressioni di contatto e superficie topologica dei cedimenti.
 * **Campi Tensoriali FEM**: Mappe di calore rappresentanti le distribuzioni di $M_x$ e $M_y$ per il dimensionamento delle armature.

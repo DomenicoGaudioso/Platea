@@ -316,22 +316,21 @@ try:
             risultati_stat = calcola_platea_rigida(dati_stat)
             risultati_sis = calcola_platea_rigida(dati_sis)
 
-    # --- Sintesi e Metriche ---
-    st.subheader("Sintesi Risultati Governanti")
-    
+    # --- Sintesi e risultati tabellati ---
+    st.subheader("Risultati principali")
     p_max_stat = risultati_stat['pressioni_kPa'].max().max()
     p_max_sis = risultati_sis['pressioni_kPa'].max().max()
-    
     ced_max_stat = risultati_stat['cedimenti_mm'].max().max()
     ced_max_sis = risultati_sis['cedimenti_mm'].max().max()
     sintesi_df = tabella_sintesi_platea(dati_stat, risultati_stat, risultati_sis, q_amm)
     verifiche_df = genera_verifiche_platea(dati_stat, risultati_stat, risultati_sis, q_amm)
-
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Pressione Max Statica [kPa]", f"{p_max_stat:.1f}", f"Limite: {q_amm:.1f}")
-    c2.metric("Pressione Max Sismica [kPa]", f"{p_max_sis:.1f}", f"Limite: {q_amm * 1.25:.1f}")
-    c3.metric("Cedimento Max [mm]", f"{max(ced_max_stat, ced_max_sis):.2f}", 
-               f"Stat: {ced_max_stat:.2f}, Sis: {ced_max_sis:.2f}")
+    risultati_principali = pd.DataFrame([
+        {"Parametro": "Pressione max statica", "Valore": f"{p_max_stat:.2f}", "Unita": "kPa", "Esito/nota": f"Limite {q_amm:.2f}"},
+        {"Parametro": "Pressione max sismica", "Valore": f"{p_max_sis:.2f}", "Unita": "kPa", "Esito/nota": f"Limite {q_amm * 1.25:.2f}"},
+        {"Parametro": "Cedimento max statico", "Valore": f"{ced_max_stat:.2f}", "Unita": "mm", "Esito/nota": "-"},
+        {"Parametro": "Cedimento max sismico", "Valore": f"{ced_max_sis:.2f}", "Unita": "mm", "Esito/nota": "-"},
+    ])
+    st.dataframe(risultati_principali, use_container_width=True, hide_index=True)
 
     if p_max_stat > q_amm or p_max_sis > q_amm * 1.25:
         st.error("Verifica a pressione massima NON soddisfatta.")
@@ -341,79 +340,47 @@ try:
     if modello_calcolo == "Rigido (analitico)":
         st.info("L'analisi con modello rigido non calcola le sollecitazioni interne (momenti). Vengono mostrate solo le pressioni e un cedimento medio.")
 
-    # --- Tabs per i risultati ---
-    tab_names = [
-        'Geometria', 
-        'Risultati Statici', 
-        'Risultati Sismici',
-        'Verifiche',
-    ]
-    with tabs[3]:
-        st.markdown('<div class="section-card">', unsafe_allow_html=True)
-        st.subheader("Verifiche e sintesi tecnica")
-        st.dataframe(sintesi_df, use_container_width=True, hide_index=True)
-        st.dataframe(verifiche_df, use_container_width=True, hide_index=True)
-        for note in genera_note_platea(modello_calcolo):
-            st.info(note)
-        st.markdown('</div>', unsafe_allow_html=True)
+    sez_geometria, sez_statica, sez_sismica, sez_verifiche, sez_report = [st.container() for _ in range(5)]
 
-    if reporting_enabled:
-        tab_names.append('Report')
-    
-    tabs = st.tabs(tab_names)
-
-    with tabs[0]:
-        st.markdown('<div class="section-card">', unsafe_allow_html=True)
-        st.subheader("Geometria, Mesh FEM e Posizione Carichi")
+    with sez_geometria:
+        st.subheader("Geometria, mesh FEM e posizione carichi")
         if modello_calcolo == "FEM (flessibile)":
             st.plotly_chart(figura_geometria_platea(dati_stat, risultati_stat), use_container_width=True, config={'displayModeBar': False})
         else:
-            st.info("La visualizzazione della mesh è disponibile solo per il modello FEM.")
-        st.markdown('</div>', unsafe_allow_html=True)
+            st.info("La visualizzazione della mesh e' disponibile solo per il modello FEM.")
 
-    with tabs[1]:
-        st.markdown('<div class="section-card">', unsafe_allow_html=True)
-        st.subheader("Mappe dei Risultati - Condizione Statica")
+    with sez_statica:
+        st.subheader("Mappe dei risultati - condizione statica")
         st.plotly_chart(figura_risultati_platea(dati_stat, risultati_stat, 'cedimenti_mm', 'Cedimenti [mm]'), use_container_width=True)
         st.plotly_chart(figura_risultati_platea(dati_stat, risultati_stat, 'pressioni_kPa', 'Pressioni [kPa]'), use_container_width=True)
-        
         col1, col2 = st.columns(2)
         with col1:
             st.plotly_chart(figura_risultati_platea(dati_stat, risultati_stat, 'Mxx_kNm_m', 'Momento Mxx [kNm/m]'), use_container_width=True)
         with col2:
             st.plotly_chart(figura_risultati_platea(dati_stat, risultati_stat, 'Myy_kNm_m', 'Momento Myy [kNm/m]'), use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
 
-    with tabs[2]:
-        st.markdown('<div class="section-card">', unsafe_allow_html=True)
-        st.subheader("Mappe dei Risultati - Condizione Sismica")
+    with sez_sismica:
+        st.subheader("Mappe dei risultati - condizione sismica")
         st.plotly_chart(figura_risultati_platea(dati_sis, risultati_sis, 'cedimenti_mm', 'Cedimenti [mm]'), use_container_width=True)
         st.plotly_chart(figura_risultati_platea(dati_sis, risultati_sis, 'pressioni_kPa', 'Pressioni [kPa]'), use_container_width=True)
-        
         col1, col2 = st.columns(2)
         with col1:
             st.plotly_chart(figura_risultati_platea(dati_sis, risultati_sis, 'Mxx_kNm_m', 'Momento Mxx [kNm/m]'), use_container_width=True)
         with col2:
             st.plotly_chart(figura_risultati_platea(dati_sis, risultati_sis, 'Myy_kNm_m', 'Momento Myy [kNm/m]'), use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+
+    with sez_verifiche:
+        st.subheader("Verifiche e sintesi tecnica")
+        st.dataframe(sintesi_df, use_container_width=True, hide_index=True)
+        st.dataframe(verifiche_df, use_container_width=True, hide_index=True)
+        for note in genera_note_platea(modello_calcolo):
+            st.info(note)
 
     if reporting_enabled:
-        with tabs[4]:
-            st.markdown('<div class="section-card">', unsafe_allow_html=True)
-            st.subheader("Generazione Relazione Tecnica")
-            st.markdown(
-                "Crea un report di calcolo in formato Microsoft Word (.docx) contenente i dati di input, "
-                "i risultati di sintesi e le visualizzazioni grafiche dell'analisi statica e sismica."
-            )
+        with sez_report:
+            st.subheader("Relazione tecnica Word")
             try:
-                report_bytes = create_word_report(
-                    dati_stat,
-                    risultati_stat,
-                    dati_sis,
-                    risultati_sis,
-                    q_amm,
-                    modello_calcolo,
-                )
+                report_bytes = create_word_report(dati_stat, risultati_stat, dati_sis, risultati_sis, q_amm, modello_calcolo)
                 st.download_button(
                     "Scarica relazione (.docx)",
                     data=report_bytes,
@@ -422,7 +389,6 @@ try:
                 )
             except Exception as report_exc:
                 st.error(f"Generazione relazione non riuscita: {report_exc}")
-            st.markdown('</div>', unsafe_allow_html=True)
 
 except Exception as e:
     st.error(f"Errore critico durante l'analisi FEM: {e}")
