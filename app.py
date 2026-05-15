@@ -382,7 +382,7 @@ try:
             try:
                 report_bytes = create_word_report(dati_stat, risultati_stat, dati_sis, risultati_sis, q_amm, modello_calcolo)
                 st.download_button(
-                    "Scarica relazione (.docx)",
+                    "Scarica relazione Word",
                     data=report_bytes,
                     file_name="relazione_platea.docx",
                     mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
